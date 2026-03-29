@@ -5,7 +5,17 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 
 function AppContent() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, status } = useAuth()
+
+  if (status === 'loading') {
+    return (
+      <main className="page">
+        <div className="card">
+          <p>Loading...</p>
+        </div>
+      </main>
+    )
+  }
 
   return isAuthenticated ? <HomePage /> : <LoginPage />
 }
