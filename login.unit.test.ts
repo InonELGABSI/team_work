@@ -18,4 +18,13 @@ describe('login feature', () => {
       }),
     ).rejects.toThrow('Invalid credentials')
   })
+
+  it('normalizes email and trims password', async () => {
+    await expect(
+      authService.login({
+        email: '  DEMO@DEMO.COM  ',
+        password: '123456   ',
+      }),
+    ).resolves.toEqual({ email: 'demo@demo.com' })
+  })
 })

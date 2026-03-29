@@ -4,23 +4,21 @@ import type { FormEvent } from 'react'
 import { useAuth } from '../hooks/useAuth'
 
 export default function LoginForm() {
-  const { login } = useAuth()
+  const { login, status, error, clearError } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+
+  const isLoading = status === 'loading'
+  const canSubmit = !isLoading && email.trim() !== '' && password.trim() !== ''
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setError('')
-    setIsLoading(true)
+    clearError()
 
     try {
       await login({ email, password })
     } catch {
-      setError('Invalid email or password')
-    } finally {
-      setIsLoading(false)
+      // Error state is handled in AuthContext.
     }
   }
 
@@ -33,7 +31,12 @@ export default function LoginForm() {
         type="email"
         placeholder="Email"
         value={email}
-        onChange={(event) => setEmail(event.target.value)}
+        onChange={(event) => {
+          setEmail(event.target.value)
+          if (error) {
+            clearError()
+          }
+        }}
         required
       />
 
@@ -41,13 +44,18 @@ export default function LoginForm() {
         type="password"
         placeholder="Password"
         value={password}
-        onChange={(event) => setPassword(event.target.value)}
+        onChange={(event) => {
+          setPassword(event.target.value)
+          if (error) {
+            clearError()
+          }
+        }}
         required
       />
 
       {error ? <p className="error-text">{error}</p> : null}
 
-      <button type="submit" disabled={isLoading}>
+      <button type="submit" disabled={!canSubmit}>
         {isLoading ? 'Logging in...' : 'Login'}
       </button>
     </form>
